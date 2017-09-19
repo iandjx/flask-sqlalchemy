@@ -1,12 +1,13 @@
 from flask import Flask
 from flask_jwt import JWT
 from flask_restful import Api
-
 from resources.item import Item, ItemList
-from resources.user import UserRegister
-from security import authenticate, identity
+
+from code.resources.user import UserRegister
+from code.security import authenticate, identity
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = 'ian'
 api = Api(app)
 
@@ -24,4 +25,7 @@ api.add_resource(UserRegister, '/register')
 
 # call app.run only when app.py is called and not when it is imported by other files
 if __name__ == '__main__':
+    # importing it here because of circular imports
+    from db import db
+    db.init_app(app)
     app.run(port=5003, debug=True)
